@@ -95,7 +95,6 @@ def get_pokemon_info(pokemon_id, language='en'):
 def generate_types_panel(types : list[str]) -> Panel:
     return Panel(
         Columns(types, equal=True, expand=True),
-        title="Types",
         border_style="blue",
         padding=(0, 1),
     )
@@ -126,10 +125,10 @@ f"""# {pokemon_info['name']}
     layout = Layout(name="root")
     layout.split_row(
         Layout(Panel(image_display), name="image", size=image_display.img.width + 4),
-        Layout(name="desc", size=((image_display.img.width + 4) -10))
+        Layout(name="desc", size=(35))
     )
     layout["desc"].split_column(
-        Layout(Panel(description), name="description"),
+        Layout(Panel(description, border_style="green"), name="description"),
         generate_types_panel(pokemon_info["types"])
     )
 
