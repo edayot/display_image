@@ -24,9 +24,9 @@ class ImageDisplay:
     def __init__(self, img : Image.Image):
         self.console = rich.console.Console()
         img = img.convert("RGBA")
-        # img = crop_null_rectangle(img)
-        # img = add_transparency_border(img, 1)
-        # img = add_empty_line(img)
+        img = crop_null_rectangle(img)
+        img = add_transparency_border(img, 1)
+        img = add_empty_line(img)
         self.img = img
     
     def __rich_console__(self, console, options):
@@ -102,11 +102,7 @@ def generate_types_panel(types: list[str]):
 
 
 
-
-@click.command()
-@click.argument('pokemon_id', type=int)
-@click.option('--language', '-l', default='en', help='Language to display the pokemon name / description')
-def main(pokemon_id, language):
+def display_pokemon(pokemon_id, language):
     console = rich.console.Console()
 
     pokemon_info = get_pokemon_info(pokemon_id, language)
@@ -136,6 +132,14 @@ f"""# {pokemon_info['name']}
     _height = image_display.img.height//2 + 2
     console.size = (_width, _height)
     console.print(layout)
+
+
+@click.command()
+@click.option('--language', '-l', default='en', help='Language to display the pokemon name / description')
+def main(language):
+    for i in range(1, 151 + 1):
+        display_pokemon(i, language)
+
     
 if __name__ == '__main__':
     main()
