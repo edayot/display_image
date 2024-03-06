@@ -136,14 +136,13 @@ f"""# {pokemon_info['name']}
 
 @click.command()
 @click.option('--language', '-l', default='en', help='Language to display the pokemon name / description')
-@click.option('--pokemon_id', '-p', default=None, help='Force the pokemon id to display')
+@click.option('--pokemon_id', '-p', default=None, multiple=True, help='Pokemon ids to display')
 def main(language, pokemon_id):
     if pokemon_id:
-        display_pokemon(pokemon_id, language)
-        return
-    for i in range(1, 151 + 1):
-        display_pokemon(i, language)
-
+        for p in pokemon_id:
+            display_pokemon(p, language)
+    else:
+        rprint("No pokemon id provided")
     
 if __name__ == '__main__':
     main()
