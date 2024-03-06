@@ -98,7 +98,7 @@ def generate_types_panel(types: list[str]):
     table.add_row("")
     for t in types:
         table.add_row(f"[{t}]")
-    return Panel(table, title="Types", border_style="blue")
+    return Panel(table, border_style="blue")
 
 
 
