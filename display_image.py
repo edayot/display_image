@@ -8,6 +8,7 @@ from rich.panel import Panel
 from rich import print as rprint
 from rich.segment import Segment
 from rich.markdown import Markdown
+from rich.table import Table
 from rich.columns import Columns
 import shutil
 import requests
@@ -23,9 +24,9 @@ class ImageDisplay:
     def __init__(self, img : Image.Image):
         self.console = rich.console.Console()
         img = img.convert("RGBA")
-        img = crop_null_rectangle(img)
-        img = add_transparency_border(img, 1)
-        img = add_empty_line(img)
+        # img = crop_null_rectangle(img)
+        # img = add_transparency_border(img, 1)
+        # img = add_empty_line(img)
         self.img = img
     
     def __rich_console__(self, console, options):
@@ -91,15 +92,13 @@ def get_pokemon_info(pokemon_id, language='en'):
     }
 
 
-
-def generate_types_panel(types : list[str]) -> Panel:
-    return Panel(
-        Columns(types, equal=True, expand=True),
-        border_style="blue",
-        padding=(0, 1),
-    )
-    
-    
+def generate_types_panel(types: list[str]):
+    table = Table.grid(padding=1, expand=True)
+    table.add_column(justify="center",vertical="middle")
+    table.add_row("")
+    for t in types:
+        table.add_row(f"[{t}]")
+    return Panel(table, title="Types", border_style="blue")
 
 
 
