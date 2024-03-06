@@ -5,14 +5,12 @@ import rich.style
 import click
 from rich.layout import Layout
 from rich.panel import Panel
-from rich import print as rprint
 from rich.segment import Segment
 from rich.markdown import Markdown
 from rich.table import Table
-from rich.columns import Columns
+from rich import print
 import shutil
 import requests
-import rich.__main__
 
 
 from utils import crop_null_rectangle, add_transparency_border, add_empty_line
@@ -134,15 +132,17 @@ f"""# {pokemon_info['name']} (#{pokemon_id})
     console.print(layout)
 
 
-@click.command()
+@click.command(name="pokeinfo")
 @click.option('--language', '-l', default='en', help='Language to display the pokemon name / description')
-@click.option('--pokemon_id', '-p', default=None, multiple=True, help='Pokemon ids to display')
+@click.option('--pokemon_id', '-p', default=None, multiple=True, type=int, help='Pokemon ids to display, can be multiple.')
 def main(language, pokemon_id):
     if pokemon_id:
         for p in pokemon_id:
             display_pokemon(p, language)
     else:
-        rprint("No pokemon id provided")
+        print(":cross_mark: [dark_red]No pokemon id provided[/dark_red]")
+        # display the help
+        print(main.get_help(click.Context(main)))
     
 if __name__ == '__main__':
     main()
