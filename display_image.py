@@ -109,7 +109,7 @@ def display_pokemon(pokemon_id, language):
 
     image_display = ImageDisplay(pokemon_info['img'])
     description = Markdown(
-f"""# {pokemon_info['name']}
+f"""# {pokemon_info['name']} (#{pokemon_id})
 
 {pokemon_info['description']}
 
