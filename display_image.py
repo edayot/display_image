@@ -16,25 +16,39 @@ import requests
 from utils import crop_null_rectangle, add_transparency_border, add_empty_line
 
 DOUBLE_PIXEL = "▀"
+DOUBLE_PIXEL_REVERSE = "▄"
+
+BACKGROUND_COLOR = rich.color.Color.from_rgb(0, 0, 0)
 
 
 class ImageDisplay:
-    def __init__(self, img : Image.Image):
+    def __init__(self, img : Image.Image, display_background=True):
         self.console = rich.console.Console()
         img = img.convert("RGBA")
         img = crop_null_rectangle(img)
         img = add_transparency_border(img, 1)
         img = add_empty_line(img)
         self.img = img
+        self.display_background = display_background
     
     def __rich_console__(self, console, options):
         for y in range(0, self.img.height, 2):
             for x in range(self.img.width):
                 p1 = self.img.getpixel((x, y))
                 p2 = self.img.getpixel((x, y + 1))
-                foreground = rich.color.Color.from_rgb(*p1[:3])
-                background = rich.color.Color.from_rgb(*p2[:3])
-                yield Segment(DOUBLE_PIXEL, style=rich.style.Style(color=foreground, bgcolor=background))
+                top_color = rich.color.Color.from_rgb(*p1[:3])
+                bottom_color = rich.color.Color.from_rgb(*p2[:3])
+
+                if self.display_background:
+                    yield Segment(DOUBLE_PIXEL, style=rich.style.Style(color=top_color, bgcolor=bottom_color))
+                elif not top_color == BACKGROUND_COLOR and not bottom_color == BACKGROUND_COLOR:
+                    yield Segment(DOUBLE_PIXEL, style=rich.style.Style(color=top_color, bgcolor=bottom_color))
+                elif top_color == BACKGROUND_COLOR and not bottom_color == BACKGROUND_COLOR:
+                    yield Segment(DOUBLE_PIXEL_REVERSE, style=rich.style.Style(color=bottom_color))
+                elif not top_color == BACKGROUND_COLOR and bottom_color == BACKGROUND_COLOR:
+                    yield Segment(DOUBLE_PIXEL, style=rich.style.Style(color=top_color))
+                else:
+                    yield Segment(" ")
             yield Segment.line()
     
 
@@ -100,12 +114,12 @@ def generate_types_panel(types: list[str]):
 
 
 
-def display_pokemon(pokemon_id, language):
+def display_pokemon(pokemon_id, language, display_background):
     console = rich.console.Console()
 
     pokemon_info = get_pokemon_info(pokemon_id, language)
 
-    image_display = ImageDisplay(pokemon_info['img'])
+    image_display = ImageDisplay(pokemon_info['img'], display_background)
     description = Markdown(
 f"""# {pokemon_info['name']} (#{pokemon_id})
 
@@ -135,10 +149,11 @@ f"""# {pokemon_info['name']} (#{pokemon_id})
 @click.command(name="pokeinfo")
 @click.option('--language', '-l', default='en', help='Language to display the pokemon name / description')
 @click.option('--pokemon_id', '-p', default=None, multiple=True, type=int, help='Pokemon ids to display, can be multiple.')
-def main(language, pokemon_id):
+@click.option('--display-background', '-d', is_flag=True, help='Display the background of the image as black pixels.')
+def main(language, pokemon_id, display_background):
     if pokemon_id:
         for p in pokemon_id:
-            display_pokemon(p, language)
+            display_pokemon(p, language, display_background)
     else:
         print(":cross_mark: [dark_red]No pokemon id provided[/dark_red]")
         # display the help
