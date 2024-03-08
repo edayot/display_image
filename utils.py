@@ -1,7 +1,7 @@
 from PIL import Image
 
 
-def crop_null_rectangle(image):
+def crop_null_rectangle(image: Image.Image):
     # Convert image to grayscale
     grayscale_image = image.convert("L")
 
@@ -31,7 +31,7 @@ def crop_null_rectangle(image):
         return None  # No non-null pixels found
 
 
-def add_transparency_border(image, border_size):
+def add_transparency_border(image: Image.Image, border_size: int):
     # Calculate new dimensions
     width, height = image.size
     new_width = width + 2 * border_size
@@ -57,7 +57,7 @@ def add_transparency_border(image, border_size):
     return border_rectangle
 
 
-def add_empty_line(image):
+def add_empty_line(image: Image.Image):
     width, height = image.size
 
     # Check if height is not a multiple of 2

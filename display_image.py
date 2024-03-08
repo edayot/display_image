@@ -73,7 +73,7 @@ def sort_by_version(x):
     return x.version.url.split("/")[-2]
 
 
-def get_pokemon_info(pokemon_id, language="en"):
+def get_pokemon_info(pokemon_id: int, language="en"):
     pokemon_info = pb.pokemon(pokemon_id)
     pokemon_species = pb.pokemon_species(pokemon_id)
     pokemon_sprites = pb.SpriteResource("pokemon", pokemon_id)
@@ -123,7 +123,7 @@ def generate_types_panel(types: list[str]):
     return Panel(table, border_style="blue")
 
 
-def display_pokemon(pokemon_id, language, display_background):
+def display_pokemon(pokemon_id: int, language: str, display_background: bool):
     console = rich.console.Console()
 
     pokemon_info = get_pokemon_info(pokemon_id, language)
