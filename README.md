@@ -19,8 +19,11 @@ poetry run pokeinfo -l en -p 1
 poetry run pokeinfo --help # for more options
 
 
-# Example output
-
 ```
+
+## Example output
+
+![Example output](./example.png)
+
 
 The list of available languages are at : https://pokeapi.co/api/v2/language, fallback to english if not found.
