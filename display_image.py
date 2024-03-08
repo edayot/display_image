@@ -8,9 +8,10 @@ from rich.panel import Panel
 from rich.segment import Segment
 from rich.markdown import Markdown
 from rich.table import Table
-from rich import print
+from rich import print, inspect
 import shutil
-import requests
+import pokebase as pb
+
 
 
 from utils import crop_null_rectangle, add_transparency_border, add_empty_line
@@ -54,43 +55,40 @@ class ImageDisplay:
 
 
 def sort_by_version(x):
-    return x["version"]["url"].split("/")[-2]
+    return x.version.url.split("/")[-2]
 
 
 def get_pokemon_info(pokemon_id, language='en'):
-    r = requests.get(f"https://pokeapi.co/api/v2/pokemon/{pokemon_id}")
-    r.raise_for_status()
+    pokemon_info = pb.pokemon(pokemon_id)
+    pokemon_species = pb.pokemon_species(pokemon_id)
+    pokemon_sprites = pb.SpriteResource("pokemon", pokemon_id)
+    img = Image.open(pokemon_sprites.path)
 
-    data = r.json()
-    img = Image.open(requests.get(data['sprites']['front_default'], stream=True).raw)
-
-    species = requests.get(data['species']['url']).json()
-    names = species['names']
-    descriptions = species['flavor_text_entries']
+    names = pokemon_species.names
+    descriptions = pokemon_species.flavor_text_entries
 
     # try to find the name in the requested language
     # fallback to english if not found
-    names_lang = [n['name'] for n in names if n['language']['name'] == language]
+    names_lang = [n.name for n in names if n.language.name == language]
     if len(names_lang) == 0:
-        names_lang = [n['name'] for n in names if n['language']['name'] == 'en']
+        names_lang = [n.name for n in names if n.language.name == 'en']
     name = names_lang[0]
 
-    descriptions_lang = [d for d in descriptions if d['language']['name'] == language]
-    if len(descriptions_lang) == 0:
-        descriptions_lang = [d for d in descriptions if d['language']['name'] == 'en']
-    descriptions_lang.sort(key=lambda x: sort_by_version(x))
-    description = descriptions_lang[0]["flavor_text"]
 
-    types = data['types']
+    descriptions_lang = [d for d in descriptions if d.language.name == language]
+    if len(descriptions_lang) == 0:
+        descriptions_lang = [d for d in descriptions if d.language.name == 'en']
+    descriptions_lang.sort(key=lambda x: sort_by_version(x))
+    description = descriptions_lang[0].flavor_text
+
+    types = pokemon_info.types
     l_types = []
     for t in types:
-        r = requests.get(t['type']['url'])
-        r.raise_for_status()
-        type_data = r.json()
-        names = type_data['names']
-        names_lang = [n['name'] for n in names if n['language']['name'] == language]
+        type_data = pb.type_(t.type.id_)
+        names = type_data.names
+        names_lang = [n.name for n in names if n.language.name == language]
         if len(names_lang) == 0:
-            names_lang = [n['name'] for n in names if n['language']['name'] == 'en']
+            names_lang = [n.name for n in names if n.language.name == 'en']
         type_name = names_lang[0]
         l_types.append(type_name)
         
